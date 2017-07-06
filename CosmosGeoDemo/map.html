@@ -1,0 +1,171 @@
+﻿
+<html>
+<head>
+    <title>Cosmos DB Is In All Your Things</title>
+    <style>
+        .stats {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 20px;
+        }
+
+        .stats td, th {
+            border: 2px solid black;
+            text-align: center;
+            padding: 8px;
+        }
+
+        .stats tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+
+        .red {
+            color: red;
+        }
+
+        .green {
+            color: green;
+        }
+
+        .blue {
+            color: blue;
+        }
+
+        #startstop {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        @keyframes updated {
+            from {
+                background-color: yellow;
+            }
+
+            to {
+                background-color: inherit;
+            }
+        }
+
+        .updated {
+            animation: updated 1s;
+        }
+    </style>
+</head>
+<body>
+<h1>Cosmos DB Is In All Your Things</h1>
+<table>
+    <tr>
+        <td style="width:67%">
+            <img id="map" src="world-map.gif" alt="world map">
+        </td>
+        <td>
+            <table class="stats">
+                <tr>
+                    <td></td>
+                    <td><button id="startstop" type="button">Start</button></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th>Location</th>
+                    <th>Primary?</th>
+                    <th>Count</th>
+                </tr>
+                <tr>
+                    <td class="red">West US</td>
+                    <td>Yes</td>
+                    <td id="red-west-us"></td>
+                </tr>
+                <tr>
+                    <td class="green">West US</td>
+                    <td>No</td>
+                    <td id="green-west-us"></td>
+                </tr>
+                <tr>
+                    <td class="blue">West US</td>
+                    <td>No</td>
+                    <td id="blue-west-us"></td>
+                </tr>
+                <tr>
+                    <td class="green">East Asia</td>
+                    <td>Yes</td>
+                    <td id="green-east-asia"></td>
+                </tr>
+                <tr>
+                    <td class="blue">East Asia</td>
+                    <td>No</td>
+                    <td id="blue-east-asia"></td>
+                </tr>
+                <tr>
+                    <td class="red">East Asia</td>
+                    <td>No</td>
+                    <td id="red-east-asia"></td>
+                </tr>
+                <tr>
+                    <td class="blue">North Europe</td>
+                    <td>Yes</td>
+                    <td id="blue-north-europe"></td>
+                </tr>
+                <tr>
+                    <td class="green">North Europe</td>
+                    <td>No</td>
+                    <td id="green-north-europe"></td>
+                </tr>
+                <tr>
+                    <td class="red">North Europe</td>
+                    <td>No</td>
+                    <td id="red-north-europe"></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<script src="Scripts/jquery-3.1.1.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        function updateCell(idx, td) {
+            $.getJSON("api/data/" + td.id, function(data) {
+                td.classList.remove("updated");
+                td.innerHTML = data.count;
+                td.classList.add("updated");
+            });
+        }
+
+        setInterval(function() {
+            $("td[id$='west-us']").each(updateCell);
+        }, 2000);
+
+        setInterval(function () {
+            $("td[id$='east-asia']").each(updateCell);
+        }, 2000);
+
+        setInterval(function () {
+            $("td[id$='north-europe']").each(updateCell);
+        }, 2000);
+
+        var intervalId;
+
+        $("#startstop").on("click", function() {
+            if ($(this).text() == "Start") {
+
+                intervalId = setInterval(function() {
+                        $.ajax({
+                            method: "POST",
+                            url: "api/data"
+                        });
+                    },
+                    5000);
+
+                $(this).text("Stop");
+
+            } else {
+
+                clearInterval(intervalId);
+
+                $(this).text("Start");
+            }
+        });
+    });
+</script>
+</body>
+</html>
